@@ -68,7 +68,7 @@ public class Client{
      */
     public static Client getClient() throws IOException, InterruptedException {
         AsynchronousChannelGroup channelGroup = AsynchronousChannelGroup.withFixedThreadPool(Runtime.getRuntime().availableProcessors(), Executors.defaultThreadFactory());
-        CountDownLatch latch = new CountDownLatch(1);
+        CountDownLatch latch = new CountDownLatch(2);
         Client c = new Client(channelGroup, latch);
         c.dealConnect();
         return c;

@@ -4,6 +4,8 @@
  */
 package com.nemo.channel.controller;
 
+import com.nemo.channel.annotation.Controller;
+import com.nemo.channel.annotation.UrlMapping;
 import com.nemo.channel.exception.ChannelException;
 
 import java.util.Map;
@@ -11,8 +13,10 @@ import java.util.Map;
 /**
  * Created by Nemo on 2018/1/19.
  */
+@Controller("")
 public class ContextController {
 
+    @UrlMapping("login")
     public String login(Map<String,Object> params){
         Object name = params.get("name");
         Object password = params.get("password");

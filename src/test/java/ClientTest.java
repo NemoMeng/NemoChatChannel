@@ -28,6 +28,8 @@ public class ClientTest {
         params.put("password","123456");
         requestBean.setParams(params);
 
+        Thread.sleep(1000);
+
         //连接完成以后，开始推送消息
         client.writeStringMessage(JSONObject.toJSONString(requestBean));
 

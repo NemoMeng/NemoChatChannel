@@ -7,6 +7,7 @@ package com.nemo.channel.server;
 import com.alibaba.fastjson.JSONObject;
 import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
+import com.nemo.channel.bean.RouteBean;
 import com.nemo.channel.controller.ContextController;
 import com.nemo.channel.enums.ResponseCode;
 import com.nemo.channel.exception.ChannelException;
@@ -121,31 +122,29 @@ public class Server {
                         if(requestBean.getMethod() == null){    //没有说明任何请求方法，异常连接，强行中断
                             shutdownChannel(channel);
                         }else {
+                            try {
+                                RouteBean routeBean = ServerCore.core().getRoute(requestBean.getMethod());
+                                if(routeBean == null){
+                                    throw new ChannelException(ResponseCode.METHOD_NOT_FOUND.name(),ResponseCode.METHOD_NOT_FOUND.getRemark());
+                                }
 
-                            Object method = ServerContext.getMethod(requestBean.getMethod());
-                            if(method==null){
-                                responseBean = new ResponseBean(ResponseCode.METHOD_NOT_FOUND.name(),ResponseCode.METHOD_NOT_FOUND.getRemark());
-                            }else {
-                                Method m = (Method) method;
-                                try {
-                                    Object invoke = m.invoke(new ContextController(), requestBean.getParams());
-                                    if(invoke != null){
-                                        responseBean = new ResponseBean();
-                                        responseBean.setData(invoke);
-                                    }
-                                } catch (Throwable e) {
-                                    if(e instanceof InvocationTargetException){
-                                        InvocationTargetException exception = (InvocationTargetException)e;
-                                        e = exception.getTargetException();
-                                    }
-                                    if(e instanceof ChannelException){
-                                        ChannelException channelException = (ChannelException) e;
-                                        responseBean.setCode(channelException.getCode());
-                                        responseBean.setMsg(channelException.getMsg());
-                                    }else {
-                                        responseBean.setCode(ResponseCode.COMMON_ERROR.name());
-                                        responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
-                                    }
+                                Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
+                                if(invoke != null){
+                                    responseBean = new ResponseBean();
+                                    responseBean.setData(invoke);
+                                }
+                            } catch (Throwable e) {
+                                if(e instanceof InvocationTargetException){
+                                    InvocationTargetException exception = (InvocationTargetException)e;
+                                    e = exception.getTargetException();
+                                }
+                                if(e instanceof ChannelException){
+                                    ChannelException channelException = (ChannelException) e;
+                                    responseBean.setCode(channelException.getCode());
+                                    responseBean.setMsg(channelException.getMsg());
+                                }else {
+                                    responseBean.setCode(ResponseCode.COMMON_ERROR.name());
+                                    responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
                                 }
                             }
                         }
@@ -174,6 +173,7 @@ public class Server {
             @Override
             public void failed(Throwable exc, Object attachment) {
                 System.out.println("server read failed: " + exc);
+                exc.printStackTrace();
                 if(channel != null){
                     try {
                         channel.close();
@@ -255,6 +255,7 @@ public class Server {
             @Override
             public void failed(Throwable exc, ByteBuffer attachment) {
                 System.out.println("server write failed: " + exc);
+                exc.printStackTrace();
             }
         });
     }

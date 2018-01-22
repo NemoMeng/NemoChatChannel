@@ -12,8 +12,17 @@ import java.io.IOException;
  */
 public class StartServer {
 
-    public static void main(String args[]) throws IOException {
-        ServerCore.core();
+    public static void main(String args[]) throws Exception {
+        ServerCore core = ServerCore.core();
+        if(!core.isInited()) {
+            //初始化容器
+            NemoFrameworkCorePackageScaner.scan("com.nemo.channel.controller");
+            //服务开启
+            Server.open();
+            //初始化完成
+            core.setInited(true);
+        }
+
     }
 
 }
