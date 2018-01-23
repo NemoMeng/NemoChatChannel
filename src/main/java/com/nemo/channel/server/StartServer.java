@@ -4,6 +4,8 @@
  */
 package com.nemo.channel.server;
 
+import com.nemo.channel.utils.NemoFrameworkPropertiesUtils;
+
 import java.io.IOException;
 
 /**
@@ -17,6 +19,8 @@ public class StartServer {
         if(!core.isInited()) {
             //初始化容器
             NemoFrameworkCorePackageScaner.scan("com.nemo.channel.controller");
+            //加载配置
+            NemoFrameworkPropertiesUtils.loadProperties();
             //服务开启
             Server.open();
             //初始化完成

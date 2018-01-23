@@ -22,7 +22,7 @@ public class ClientTest {
         Client client = Client.getClient();
 
         RequestBean requestBean = new RequestBean();
-        requestBean.setMethod("login");
+        requestBean.setMethod("msg");
         Map<String,Object> params = new HashMap<>();
         params.put("name","Nemo");
         params.put("password","123456");
@@ -34,7 +34,15 @@ public class ClientTest {
         client.writeStringMessage(JSONObject.toJSONString(requestBean));
 
         //推送完成，等下，看下啥回复
-        Thread.sleep(1000);
+        Thread.sleep(2000);
+
+        requestBean.setMethod("msg");
+        client.writeStringMessage(JSONObject.toJSONString(requestBean));
+
+        Thread.sleep(2000);
+
+        client.writeStringMessage(JSONObject.toJSONString(requestBean));
+
     }
 
 }

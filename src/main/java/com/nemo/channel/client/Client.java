@@ -242,6 +242,7 @@ public class Client{
 
             @Override
             public void failed(Throwable exc, ByteBuffer attachment) {
+                exc.printStackTrace();
             }
         });
     }

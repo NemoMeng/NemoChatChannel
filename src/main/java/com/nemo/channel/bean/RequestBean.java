@@ -17,6 +17,8 @@ public class RequestBean {
 
     private Map<String,Object> params;
 
+    private String token;
+
     public String getMethod() {
         return method;
     }
@@ -31,5 +33,13 @@ public class RequestBean {
 
     public void setParams(Map<String, Object> params) {
         this.params = params;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -9,10 +9,15 @@ import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
 import com.nemo.channel.bean.RouteBean;
 import com.nemo.channel.controller.ContextController;
+import com.nemo.channel.enums.PropertiesKeys;
 import com.nemo.channel.enums.ResponseCode;
+import com.nemo.channel.exception.AddChannelException;
 import com.nemo.channel.exception.ChannelException;
+import com.nemo.channel.exception.ShutdownChannelException;
 import com.nemo.channel.utils.CharsetUtils;
 import com.nemo.channel.utils.Helper;
+import com.nemo.channel.utils.NemoFrameworkPropertiesUtils;
+import com.nemo.channel.utils.NemoFrameworkUrlUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -109,6 +114,10 @@ public class Server {
 
             @Override
             public void completed(Integer count, Object attachment) {
+
+                boolean shutdowned = false;
+                ServerCore core = ServerCore.core();
+
                 if(count > 0){
                     try{
                         readBuffer.flip();
@@ -121,11 +130,21 @@ public class Server {
                         RequestBean requestBean = JSONObject.parseObject(question,RequestBean.class);
                         if(requestBean.getMethod() == null){    //没有说明任何请求方法，异常连接，强行中断
                             shutdownChannel(channel);
+                            shutdowned = true;
                         }else {
                             try {
                                 RouteBean routeBean = ServerCore.core().getRoute(requestBean.getMethod());
                                 if(routeBean == null){
                                     throw new ChannelException(ResponseCode.METHOD_NOT_FOUND.name(),ResponseCode.METHOD_NOT_FOUND.getRemark());
+                                }
+
+                                String loginPath = NemoFrameworkUrlUtils.getFullRequestUrl(NemoFrameworkPropertiesUtils.getProp(PropertiesKeys.LOGIN_URL.getKey()));
+                                //非登录请求，检查客户端是否已经登录,没有登录，则直接终止连接
+                                if(!loginPath.equals(routeBean.getPath())){
+                                    boolean channelExits = core.isChannelExits(channel);
+                                    if(!channelExits){
+                                        throw new ShutdownChannelException();
+                                    }
                                 }
 
                                 Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
@@ -138,31 +157,47 @@ public class Server {
                                     InvocationTargetException exception = (InvocationTargetException)e;
                                     e = exception.getTargetException();
                                 }
-                                if(e instanceof ChannelException){
+                                if(e instanceof ChannelException) {
                                     ChannelException channelException = (ChannelException) e;
                                     responseBean.setCode(channelException.getCode());
                                     responseBean.setMsg(channelException.getMsg());
+                                    responseBean.setData(channelException.getData());
+                                }else if(e instanceof ShutdownChannelException){
+                                    shutdownChannel(channel);
+                                    shutdowned = true;
+                                }else if(e instanceof AddChannelException){
+                                    core.addChannel(channel);
                                 }else {
                                     responseBean.setCode(ResponseCode.COMMON_ERROR.name());
                                     responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
                                 }
                             }
                         }
-                        writeStringMessage(channel,JSONObject.toJSONString(responseBean));
+                        if(!shutdowned) {
+                            writeStringMessage(channel, JSONObject.toJSONString(responseBean));
+                        }
                         readBuffer.clear();
                     }
                     catch(IOException e){
                         e.printStackTrace();
                     }finally {
                         //继续读取
-                        dealRead(channel,attachment);
+                        if(!shutdowned) {
+                            dealRead(channel, attachment);
+                        }
                     }
                 }
                 else{
                     //如果客户端关闭socket，那么服务器也需要关闭，否则浪费CPU
                     System.out.println(Thread.currentThread().getName() +"客户端请求关闭");
                     shutdownChannel(channel);
+                    shutdowned = true;
                 }
+
+                if(shutdowned){
+                    core.removeChannel(channel);
+                }
+
             }
 
             /**
@@ -266,6 +301,6 @@ public class Server {
      * @throws CharacterCodingException
      */
     private void writeStringMessage(final AsynchronousSocketChannel channel, String msg) throws CharacterCodingException {
-        writeMessage(channel, Charset.forName("UTF-8").newEncoder().encode(CharBuffer.wrap(msg)));
+        writeMessage(channel, CharsetUtils.encode(msg));
     }
 }

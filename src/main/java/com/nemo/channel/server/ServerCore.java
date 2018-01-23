@@ -9,6 +9,9 @@ import com.nemo.channel.utils.NemoFrameworkUrlUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.channels.Channel;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 服务核心
@@ -18,21 +21,23 @@ public class ServerCore {
 
     private static ServerCore core;
 
-    public Routers routers = new Routers();
+    private Routers routers = new Routers();
+
+    private Map<Channel,Integer> channels = new HashMap<>();
 
     /**
      * 是否已经初始化的标志
      */
     private boolean isInited = false;
 
-    public static ServerCore core() throws Exception {
+    public static ServerCore core() {
         if(core == null){
             core = new ServerCore();
         }
         return core;
     }
 
-    private ServerCore() throws Exception {
+    private ServerCore(){
     }
 
     private void init(){
@@ -57,5 +62,17 @@ public class ServerCore {
 
     public void setInited(boolean isInited){
         core.isInited = isInited;
+    }
+
+    public void addChannel(Channel channel){
+        channels.put(channel,1);
+    }
+
+    public boolean isChannelExits(Channel channel){
+        return channels.get(channel)!=null;
+    }
+
+    public void removeChannel(Channel channel){
+        channels.remove(channel);
     }
 }

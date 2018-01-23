@@ -5,7 +5,8 @@
 package com.nemo.channel.utils;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.lang.reflect.Parameter;
+import java.util.Map;
 
 /**
  * 反射相关操作工具
@@ -25,6 +26,38 @@ public class ReflectUtils  {
             return object;
         }
         return null;
+    }
+
+    /**
+     * 参数处理
+     * @param method
+     * @param params
+     * @return
+     */
+    public static Object[] dealMethodParams(Method method, Map<String,Object> params){
+        Parameter[] parameters = method.getParameters();
+        if (parameters!=null) {
+            Object args[] = new Object[parameters.length];
+            for(int i=0;i<parameters.length;i++){
+                Parameter parameter = parameters[i];
+                String name = parameter.getName();
+                args[i] = params.get(name);
+            }
+            return args;
+        }
+        return new Object[0];
+    }
+
+    /**
+     * 执行方法
+     * @param bean
+     * @param method
+     * @param params
+     * @return
+     */
+    public static Object invokeMehod(Object bean, Method method,Map<String,Object> params) {
+        Object args[] = dealMethodParams(method,params);
+        return invokeMehod(bean,method,args);
     }
 
     /**
