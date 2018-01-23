@@ -2,39 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fafb4621-3b76-422c-8c32-64a64509c42a" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/annotation/ReqBody.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientThread.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientUI.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/exception/GlobalMsgException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/ServerContext.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/utils/BeanUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/RequestBean.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/RequestBean.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/ResponseBean.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/ResponseBean.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$1.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$2.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$3.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/controller/ContextController.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/controller/ContextController.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/enums/ResponseCode.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/enums/ResponseCode.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/ChannelException.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/ChannelException.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$1.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$2.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$3.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/ServerCore.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/ServerCore.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/CharsetUtils.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/CharsetUtils.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/Helper.class" afterPath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/Helper.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/test-classes/ClientTest.class" afterPath="$PROJECT_DIR$/target/test-classes/ClientTest.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/RequestBean.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/RequestBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/Client.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/Client.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/controller/ContextController.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/controller/ContextController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/enums/ResponseCode.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/enums/ResponseCode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/exception/AddChannelException.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/exception/AddChannelException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/ServerCore.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/ServerCore.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/utils/ReflectUtils.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/utils/ReflectUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/ClientTest.java" afterPath="$PROJECT_DIR$/src/test/java/ClientTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -145,8 +113,8 @@
       <file leaf-file-name="ClientThread.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientThread.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+            <state relative-caret-position="384">
+              <caret line="26" column="32" lean-forward="true" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
               <folding>
                 <element signature="e#0#550#0" expanded="true" />
               </folding>
@@ -696,7 +664,7 @@
       <updated>1516328719801</updated>
       <workItem from="1516328722902" duration="17894000" />
       <workItem from="1516603802748" duration="9730000" />
-      <workItem from="1516618617732" duration="22686000" />
+      <workItem from="1516618617732" duration="22798000" />
     </task>
     <task id="LOCAL-00001" summary="1、容器集成。&#10;2、方法调用相关调整。&#10;3、框架相关细节调整。">
       <created>1516620551467</created>
@@ -712,7 +680,14 @@
       <option name="project" value="LOCAL" />
       <updated>1516676649307</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="1、群聊基本实现。">
+      <created>1516697291083</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1516697291083</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -748,7 +723,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50310000" />
+    <option name="totallyTimeSpent" value="50422000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -827,7 +802,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="1、容器集成。&#10;2、方法调用相关调整。&#10;3、框架相关细节调整。" />
     <MESSAGE value="1、授权相关调整。" />
-    <option name="LAST_COMMIT_MESSAGE" value="1、授权相关调整。" />
+    <MESSAGE value="1、群聊基本实现。" />
+    <option name="LAST_COMMIT_MESSAGE" value="1、群聊基本实现。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1316,8 +1292,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+        <state relative-caret-position="384">
+          <caret line="26" column="32" lean-forward="true" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
           <folding>
             <element signature="e#0#550#0" expanded="true" />
           </folding>
