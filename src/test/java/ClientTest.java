@@ -6,6 +6,7 @@
 import com.alibaba.fastjson.JSONObject;
 import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.client.Client;
+import com.nemo.channel.client.ClientThread;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,6 +22,10 @@ public class ClientTest {
     public void test() throws IOException, InterruptedException {
         Client client = Client.getClient();
 
+        ClientThread thread = new ClientThread();
+        thread.setClient(client);
+        new Thread(thread).start();
+
         RequestBean requestBean = new RequestBean();
         requestBean.setMethod("msg");
         Map<String,Object> params = new HashMap<>();
@@ -28,19 +33,11 @@ public class ClientTest {
         params.put("password","123456");
         requestBean.setParams(params);
 
-        Thread.sleep(1000);
 
         //连接完成以后，开始推送消息
         client.writeStringMessage(JSONObject.toJSONString(requestBean));
-
-        //推送完成，等下，看下啥回复
-        Thread.sleep(2000);
-
         requestBean.setMethod("msg");
         client.writeStringMessage(JSONObject.toJSONString(requestBean));
-
-        Thread.sleep(2000);
-
         client.writeStringMessage(JSONObject.toJSONString(requestBean));
 
     }

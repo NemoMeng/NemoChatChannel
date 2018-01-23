@@ -4,8 +4,12 @@
  */
 package com.nemo.channel.utils;
 
+import com.nemo.channel.server.ServerContext;
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,9 +59,36 @@ public class ReflectUtils  {
      * @param params
      * @return
      */
-    public static Object invokeMehod(Object bean, Method method,Map<String,Object> params) {
-        Object args[] = dealMethodParams(method,params);
-        return invokeMehod(bean,method,args);
+    public static Object invokeMehod(Object bean, Method method, Map<String,Object> params, ServerContext context) throws InvocationTargetException, IllegalAccessException {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if(parameterTypes == null || parameterTypes.length<=0){
+            return invokeMehod(bean,method,new Object[0]);
+        }
+
+        Object attrs[] = new Object[parameterTypes.length];
+        for(int i=0;i<parameterTypes.length;i++){
+            Class cls = parameterTypes[i];
+            if(cls.getName().equals("com.nemo.channel.server.ServerContext")){
+                attrs[i] = context;
+            }else{
+                Object o;
+                try{
+                    o = parameterTypes[0].newInstance();
+                    o = BeanUtils.transMap2Bean(params,o);
+                }catch (Exception e){
+                    o = params;
+                }
+                attrs[i] = o;
+            }
+        }
+
+        try {
+
+            return invokeMehod(bean,method,attrs);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -67,21 +98,16 @@ public class ReflectUtils  {
      * @param args
      * @return
      */
-    public static Object invokeMehod(Object bean, Method method,Object[] args) {
-        try {
-            Class<?>[] types = method.getParameterTypes();
-            int argCount = args == null ? 0 : args.length;
-            // 参数个数对不上
-            ExceptionUtil.makeRunTimeWhen(argCount != types.length, "%s in %s", method.getName(), bean);
-            // 转参数类型
-            for (int i = 0; i < argCount; i++) {
-                args[i] = cast(args[i], types[i]);
-            }
-            return method.invoke(bean, args);
-        } catch (Exception e) {
-            ExceptionUtil.makeRuntime(e);
+    public static Object invokeMehod(Object bean, Method method,Object[] args) throws InvocationTargetException, IllegalAccessException {
+        Class<?>[] types = method.getParameterTypes();
+        int argCount = args == null ? 0 : args.length;
+        // 参数个数对不上
+        ExceptionUtil.makeRunTimeWhen(argCount != types.length, "%s in %s", method.getName(), bean);
+        // 转参数类型
+        for (int i = 0; i < argCount; i++) {
+            args[i] = cast(args[i], types[i]);
         }
-        return null;
+        return method.invoke(bean, args);
     }
 
     /**

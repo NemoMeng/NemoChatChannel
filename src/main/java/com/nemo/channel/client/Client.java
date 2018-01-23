@@ -4,7 +4,10 @@
  */
 package com.nemo.channel.client;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nemo.channel.bean.AuthBean;
+import com.nemo.channel.bean.ResponseBean;
+import com.nemo.channel.enums.ResponseCode;
 import com.nemo.channel.utils.CharsetUtils;
 import com.nemo.channel.utils.Helper;
 
@@ -35,6 +38,8 @@ public class Client{
     private boolean writing = false;
     final ByteBuffer readBuffer = ByteBuffer.allocateDirect(1024);
 
+    private ClientUI ui;
+
     private Client(AsynchronousChannelGroup channelGroup, CountDownLatch latch) throws IOException, InterruptedException{
         this.latch = latch;
         helper = new Helper();
@@ -56,7 +61,6 @@ public class Client{
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-
         Client c = getClient();
     }
 
@@ -72,6 +76,10 @@ public class Client{
         Client c = new Client(channelGroup, latch);
         c.dealConnect();
         return c;
+    }
+
+    public void setUI(ClientUI ui){
+        this.ui = ui;
     }
 
     /**
@@ -130,24 +138,35 @@ public class Client{
              * @param result
              */
             private void dealCallBack(Integer result,Object attachment) {
-                try{
-                    //异步读取完成后处理
-                    if(result > 0){
-                        readBuffer.flip();
+                //异步读取完成后处理
+                if(result > 0){
+                    readBuffer.flip();
+                    try {
                         CharBuffer charBuffer = CharsetUtils.decode(readBuffer);
                         String answer = charBuffer.toString();
                         System.out.println(Thread.currentThread().getName() + "---" + answer);
                         readBuffer.clear();
 
-                        dealRead(attachment);
+                        ResponseBean responseBean = JSONObject.parseObject(answer,ResponseBean.class);
+                        if(!responseBean.getCode().equals(ResponseCode.SUCCESS.name())) {
+                            if(responseBean.getCode().equals(ResponseCode.MSG_TYPE.name())){
+                                ui.addShow(responseBean.getData().toString());
+                            }else {
+                                ui.addShow(answer);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    else{
-                        //对方已经关闭channel，自己被动关闭，避免空循环
-                        shutdown();
-                    }
+                    dealRead(attachment);
                 }
-                catch(Exception e){
-                    e.printStackTrace();
+                else{
+                    //对方已经关闭channel，自己被动关闭，避免空循环
+                    try {
+                        shutdown();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -173,7 +192,7 @@ public class Client{
      * 客户端关闭
      * @throws IOException
      */
-    private void shutdown() throws IOException {
+    public void shutdown() throws IOException {
         if(channel != null){
             channel.close();
         }

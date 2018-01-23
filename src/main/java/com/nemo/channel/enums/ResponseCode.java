@@ -8,6 +8,8 @@ public enum ResponseCode {
     METHOD_NOT_FOUND("请求的方法找不到"),
     SUCCESS("操作成功"),
     COMMON_ERROR("操作失败，请重试"),
+    PARAMETER_ERROR("参数错误"),
+    MSG_TYPE("消息"),
     ;
 
     private String remark;

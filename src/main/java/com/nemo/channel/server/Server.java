@@ -13,11 +13,9 @@ import com.nemo.channel.enums.PropertiesKeys;
 import com.nemo.channel.enums.ResponseCode;
 import com.nemo.channel.exception.AddChannelException;
 import com.nemo.channel.exception.ChannelException;
+import com.nemo.channel.exception.GlobalMsgException;
 import com.nemo.channel.exception.ShutdownChannelException;
-import com.nemo.channel.utils.CharsetUtils;
-import com.nemo.channel.utils.Helper;
-import com.nemo.channel.utils.NemoFrameworkPropertiesUtils;
-import com.nemo.channel.utils.NemoFrameworkUrlUtils;
+import com.nemo.channel.utils.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,14 +24,12 @@ import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
+import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 
@@ -43,8 +39,6 @@ import java.util.concurrent.Executors;
  */
 public class Server {
     private final AsynchronousServerSocketChannel server;
-    //写队列，因为当前一个异步写调用还没完成之前，调用异步写会抛WritePendingException
-    //所以需要一个写队列来缓存要写入的数据，这是AIO比较坑的地方
     private final Queue<ByteBuffer> queue = new LinkedList<ByteBuffer>();
     private boolean writing = false;
 
@@ -130,12 +124,17 @@ public class Server {
                         RequestBean requestBean = JSONObject.parseObject(question,RequestBean.class);
                         if(requestBean.getMethod() == null){    //没有说明任何请求方法，异常连接，强行中断
                             shutdownChannel(channel);
+                            core.removeChannel(channel);
                             shutdowned = true;
                         }else {
                             try {
                                 RouteBean routeBean = ServerCore.core().getRoute(requestBean.getMethod());
                                 if(routeBean == null){
                                     throw new ChannelException(ResponseCode.METHOD_NOT_FOUND.name(),ResponseCode.METHOD_NOT_FOUND.getRemark());
+                                }
+
+                                if(requestBean.getParams()==null){
+                                    throw new ChannelException(ResponseCode.PARAMETER_ERROR.name(),ResponseCode.PARAMETER_ERROR.getRemark());
                                 }
 
                                 String loginPath = NemoFrameworkUrlUtils.getFullRequestUrl(NemoFrameworkPropertiesUtils.getProp(PropertiesKeys.LOGIN_URL.getKey()));
@@ -147,7 +146,11 @@ public class Server {
                                     }
                                 }
 
-                                Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
+                                ServerContext serverContext = new ServerContext();
+                                serverContext.setChannel(channel);
+                                Object invoke = ReflectUtils.invokeMehod(routeBean.getController(),routeBean.getMethod(), requestBean.getParams(),serverContext);
+
+                                //Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
                                 if(invoke != null){
                                     responseBean = new ResponseBean();
                                     responseBean.setData(invoke);
@@ -165,12 +168,20 @@ public class Server {
                                 }else if(e instanceof ShutdownChannelException){
                                     shutdownChannel(channel);
                                     shutdowned = true;
-                                }else if(e instanceof AddChannelException){
-                                    core.addChannel(channel);
+                                }else if(e instanceof AddChannelException) {
+                                    core.addChannel(channel, ((AddChannelException) e).getName());
+                                } else if (e instanceof GlobalMsgException){
+                                    String name = core.getChannelName(channel);
+                                    String msg = "【"+name+"】:"+JSONObject.toJSONString(((GlobalMsgException) e).getMsg());
+                                    ResponseBean msgBean = new ResponseBean();
+                                    msgBean.setData(msg);
+                                    msgBean.setCode(ResponseCode.MSG_TYPE.name());
+                                    publish2All(JSONObject.toJSONString(msgBean));
                                 }else {
                                     responseBean.setCode(ResponseCode.COMMON_ERROR.name());
                                     responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
                                 }
+                                e.printStackTrace();
                             }
                         }
                         if(!shutdowned) {
@@ -302,5 +313,35 @@ public class Server {
      */
     private void writeStringMessage(final AsynchronousSocketChannel channel, String msg) throws CharacterCodingException {
         writeMessage(channel, CharsetUtils.encode(msg));
+    }
+
+    /**
+     * 发送到全部人
+     * @param msg
+     */
+    private void publish2All(String msg) throws CharacterCodingException {
+        ServerCore core = ServerCore.core();
+        Map<AsynchronousSocketChannel, String> channels = core.getChannels();
+        for(AsynchronousSocketChannel channel : channels.keySet()){
+            if(channel.isOpen()) {
+                ByteBuffer byteBuffer = CharsetUtils.encode(msg);
+                channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
+                    @Override
+                    public void completed(Integer result, ByteBuffer buffer) {
+                        if (buffer.hasRemaining()) {
+                            channel.write(buffer, buffer, this);
+                        }
+                    }
+
+                    @Override
+                    public void failed(Throwable exc, ByteBuffer attachment) {
+                        System.out.println("server write failed: " + exc);
+                        exc.printStackTrace();
+                    }
+                });
+            }else {
+                core.removeChannel(channel);
+            }
+        }
     }
 }

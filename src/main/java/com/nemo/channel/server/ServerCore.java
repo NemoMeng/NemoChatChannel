@@ -7,8 +7,8 @@ package com.nemo.channel.server;
 import com.nemo.channel.bean.RouteBean;
 import com.nemo.channel.utils.NemoFrameworkUrlUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.Channel;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class ServerCore {
 
     private Routers routers = new Routers();
 
-    private Map<Channel,Integer> channels = new HashMap<>();
+    private Map<AsynchronousSocketChannel,String> channels = new HashMap<>();
 
     /**
      * 是否已经初始化的标志
@@ -64,15 +64,23 @@ public class ServerCore {
         core.isInited = isInited;
     }
 
-    public void addChannel(Channel channel){
-        channels.put(channel,1);
+    public synchronized Map<AsynchronousSocketChannel, String>  getChannels(){
+        return channels;
     }
 
-    public boolean isChannelExits(Channel channel){
+    public void addChannel(AsynchronousSocketChannel channel,String name){
+        getChannels().put(channel,name);
+    }
+
+    public boolean isChannelExits(AsynchronousSocketChannel channel){
         return channels.get(channel)!=null;
     }
 
-    public void removeChannel(Channel channel){
-        channels.remove(channel);
+    public void removeChannel(AsynchronousSocketChannel channel){
+        getChannels().remove(channel);
+    }
+
+    public String getChannelName(AsynchronousSocketChannel channel){
+        return channels.get(channel);
     }
 }
