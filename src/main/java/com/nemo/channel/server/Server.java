@@ -9,7 +9,6 @@ import com.nemo.channel.bean.PrivateMsgBean;
 import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
 import com.nemo.channel.bean.RouteBean;
-import com.nemo.channel.controller.ContextController;
 import com.nemo.channel.enums.PropertiesKeys;
 import com.nemo.channel.enums.ResponseCode;
 import com.nemo.channel.exception.AddChannelException;
@@ -27,14 +26,8 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 服务提供者
@@ -44,12 +37,7 @@ public class Server {
 
     private final AsynchronousServerSocketChannel server;
 
-    //私有信息队列
-    private static final LinkedBlockingQueue<PrivateMsgBean> privateMsgQueue = new LinkedBlockingQueue<PrivateMsgBean>();
-    //公共信息队列
-    private static final LinkedBlockingQueue<String> publicMsgQueue = new LinkedBlockingQueue<>();
-    //在发送信息的客户端队列
-    private static Map<AsynchronousSocketChannel,Integer> writingChannel = new HashMap<>();
+    private static ServerCore core = ServerCore.core();
 
     private Server() throws IOException{
         //设置线程数为CPU核数
@@ -117,7 +105,6 @@ public class Server {
             public void completed(Integer count, Object attachment) {
 
                 boolean shutdowned = false;
-                ServerCore core = ServerCore.core();
 
                 if(count > 0){
                     try{
@@ -135,7 +122,7 @@ public class Server {
                             shutdowned = true;
                         }else {
                             try {
-                                RouteBean routeBean = ServerCore.core().getRoute(requestBean.getMethod());
+                                RouteBean routeBean = core.getRoute(requestBean.getMethod());
                                 if(routeBean == null){
                                     throw new ChannelException(ResponseCode.METHOD_NOT_FOUND.name(),ResponseCode.METHOD_NOT_FOUND.getRemark());
                                 }
@@ -153,9 +140,8 @@ public class Server {
                                     }
                                 }
 
-                                ServerContext serverContext = new ServerContext();
-                                serverContext.setChannel(channel);
-                                Object invoke = ReflectUtils.invokeMehod(routeBean.getController(),routeBean.getMethod(), requestBean.getParams());
+                                ServerContext serverContext = new ServerContext(channel,requestBean.getParams());
+                                Object invoke = ReflectUtils.invokeMehod(routeBean.getController(),routeBean.getMethod(), serverContext);
 
                                 //Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
                                 if(invoke != null){
@@ -178,23 +164,16 @@ public class Server {
                                 }else if(e instanceof AddChannelException) {
                                     core.addChannel(channel, ((AddChannelException) e).getName());
                                 } else if (e instanceof GlobalMsgException){
-                                    String name = core.getChannelName(channel);
-                                    String msg = "【"+name+"】:"+JSONObject.toJSONString(((GlobalMsgException) e).getMsg());
-                                    ResponseBean msgBean = new ResponseBean();
-                                    msgBean.setData(msg);
-                                    msgBean.setCode(ResponseCode.MSG_TYPE.name());
-
-                                    sendPublic(JSONObject.toJSONString(msgBean));
+                                    core.sendPublic(channel,JSONObject.toJSONString(((GlobalMsgException) e).getMsg()));
                                 }else {
                                     responseBean.setCode(ResponseCode.COMMON_ERROR.name());
                                     responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
+                                    e.printStackTrace();
                                 }
-                                e.printStackTrace();
                             }
                         }
                         if(!shutdowned) {
-                            sendPrivate(channel,JSONObject.toJSONString(responseBean));
-                            //notifySingle(channel, JSONObject.toJSONString(responseBean));
+                            core.sendPrivate(channel,JSONObject.toJSONString(responseBean));
                         }
                         readBuffer.clear();
                     }
@@ -256,45 +235,15 @@ public class Server {
     }
 
     /**
-     * 发送给单独用户
-     * @param channel
-     * @param msg
-     */
-    private static void sendPrivate(AsynchronousSocketChannel channel,String msg){
-        try {
-            PrivateMsgBean privateMsgBean = new PrivateMsgBean();
-            privateMsgBean.setMsg(msg);
-            privateMsgBean.setChannel(channel);
-            privateMsgQueue.put(privateMsgBean);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 发送给所有用户
-     * @param msg
-     */
-    public static void sendPublic(String msg){
-        try {
-            publicMsgQueue.put(msg);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * 从队列中读取发送给某个人的消息
      */
     private static void publishToSingle(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ServerCore core = ServerCore.core();
                 PrivateMsgBean privateMsgBean;
                 try {
-                    while ((privateMsgBean = privateMsgQueue.take()) != null) {
-                        System.out.println("===== single ====");
+                    while ((privateMsgBean = core.privateMsgQueue.take()) != null) {
                         AsynchronousSocketChannel channel = privateMsgBean.getChannel();
                         if (channel.isOpen()) {
                             notifySingle(channel, privateMsgBean.getMsg());
@@ -318,11 +267,10 @@ public class Server {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                ServerCore core = ServerCore.core();
                 Map<AsynchronousSocketChannel, String> channels = core.getChannels();
                 String msg;
                 try {
-                    while ((msg = publicMsgQueue.take()) != null) {
+                    while ((msg = core.publicMsgQueue.take()) != null) {
                         for (AsynchronousSocketChannel channel : channels.keySet()) {
                             if(channel.isOpen()) {
                                 notifySingle(channel, msg);
@@ -347,8 +295,8 @@ public class Server {
         try {
             if(msg!=null) {
                 //阻塞等待当前channel没有在发送消息
-                while (writingChnnelExits(channel)) {}
-                addWritingChannel(channel);
+                while (core.writingChnnelExits(channel)) {}
+                core.addWritingChannel(channel);
                 ByteBuffer byteBuffer = CharsetUtils.encode(msg);
                 channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
                     @Override
@@ -356,12 +304,12 @@ public class Server {
                         if (buffer.hasRemaining()) {
                             channel.write(buffer, buffer, this);
                         }
-                        removeWritingChannel(channel);
+                        core.removeWritingChannel(channel);
                     }
 
                     @Override
                     public void failed(Throwable exc, ByteBuffer attachment) {
-                        removeWritingChannel(channel);
+                        core.removeWritingChannel(channel);
                         System.out.println("server write failed: " + exc);
                         exc.printStackTrace();
                     }
@@ -369,26 +317,10 @@ public class Server {
             }
         }catch (Exception e){
             e.printStackTrace();
-            removeWritingChannel(channel);
+            core.removeWritingChannel(channel);
         }
     }
 
-    public static void addWritingChannel(AsynchronousSocketChannel channel){
-        synchronized (writingChannel) {
-            writingChannel.put(channel, 1);
-        }
-    }
 
-    public static boolean writingChnnelExits(AsynchronousSocketChannel channel){
-        synchronized (writingChannel) {
-            return writingChannel.containsKey(channel);
-        }
-    }
-
-    public static void removeWritingChannel(AsynchronousSocketChannel channel){
-        synchronized (writingChannel){
-            writingChannel.remove(channel);
-        }
-    }
 
 }

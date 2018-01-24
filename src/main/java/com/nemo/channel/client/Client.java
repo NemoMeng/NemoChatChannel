@@ -6,6 +6,7 @@ package com.nemo.channel.client;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nemo.channel.bean.AuthBean;
+import com.nemo.channel.bean.MsgBean;
 import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
 import com.nemo.channel.enums.ResponseCode;
@@ -151,8 +152,11 @@ public class Client{
                         ResponseBean responseBean = JSONObject.parseObject(answer,ResponseBean.class);
                         if(!responseBean.getCode().equals(ResponseCode.SUCCESS.name())) {
                             if(responseBean.getCode().equals(ResponseCode.MSG_TYPE.name())){
-                                ui.addShow(responseBean.getData().toString());
+                                MsgBean msgBean = JSONObject.parseObject(responseBean.getData().toString(),MsgBean.class);
+                                String msg = "【"+msgBean.getForm()+"】说:"+msgBean.getMsg();
+                                ui.addShow(msg);
                             }else {
+                                //例外也打印好了
                                 ui.addShow(answer);
                             }
                         }

@@ -13,6 +13,8 @@ public class MsgBean {
 
     private String to;
 
+    private String form;
+
     public String getMsg() {
         return msg;
     }
@@ -27,5 +29,13 @@ public class MsgBean {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getForm() {
+        return form;
+    }
+
+    public void setForm(String form) {
+        this.form = form;
     }
 }

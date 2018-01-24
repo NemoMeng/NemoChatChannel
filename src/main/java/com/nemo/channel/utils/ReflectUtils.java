@@ -9,7 +9,6 @@ import com.nemo.channel.server.ServerContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,17 +55,14 @@ public class ReflectUtils  {
      * 执行方法
      * @param bean
      * @param method
-     * @param params
+     * @param context
      * @return
      */
-    public static Object invokeMehod(Object bean, Method method, Object params) throws InvocationTargetException, IllegalAccessException {
+    public static Object invokeMehod(Object bean, Method method, ServerContext context) throws InvocationTargetException, IllegalAccessException {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if(parameterTypes == null || parameterTypes.length<=0){
             return invokeMehod(bean,method,new Object[0]);
         }
-
-        ServerContext context = new ServerContext();
-        context.setParameter(params);
 
         Object attrs[] = new Object[parameterTypes.length];
         for(int i=0;i<parameterTypes.length;i++){

@@ -51,12 +51,12 @@ public class ContextController {
     public void chat(ServerContext<MsgBean> context){
         MsgBean parameter = context.getParameter(MsgBean.class);
         String msg = parameter.getMsg();
-        throw new GlobalMsgException(null,(msg==null?"对方没有发送任何消息":msg.toString()));
+        msg = (msg==null)?"对方没有发送任何消息":msg.toString();
+        context.sendPublicMsg(msg);
     }
 
     @UrlMapping("change/name")
-    public void changeName(ServerContext context){
-        ServerCore core = ServerCore.core();
-//        core.get
+    public void changeName(ServerContext<MsgBean> context){
+        MsgBean msgBean = context.getParameter(MsgBean.class);
     }
 }
