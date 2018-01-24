@@ -29,6 +29,7 @@ import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -43,8 +44,12 @@ public class Server {
 
     private final AsynchronousServerSocketChannel server;
 
+    //私有信息队列
     private static final LinkedBlockingQueue<PrivateMsgBean> privateMsgQueue = new LinkedBlockingQueue<PrivateMsgBean>();
+    //公共信息队列
     private static final LinkedBlockingQueue<String> publicMsgQueue = new LinkedBlockingQueue<>();
+    //在发送信息的客户端队列
+    private static Map<AsynchronousSocketChannel,Integer> writingChannel = new HashMap<>();
 
     private Server() throws IOException{
         //设置线程数为CPU核数
@@ -292,7 +297,7 @@ public class Server {
                         System.out.println("===== single ====");
                         AsynchronousSocketChannel channel = privateMsgBean.getChannel();
                         if (channel.isOpen()) {
-                            notifySingle(privateMsgBean.getChannel(), privateMsgBean.getMsg());
+                            notifySingle(channel, privateMsgBean.getMsg());
                         } else {
                             core.removeChannel(channel);
                         }
@@ -319,8 +324,11 @@ public class Server {
                 try {
                     while ((msg = publicMsgQueue.take()) != null) {
                         for (AsynchronousSocketChannel channel : channels.keySet()) {
-                            //多线程下会有问题，这里先转私有发送队列，由私有发送通道发送
-                            sendPrivate(channel,msg);
+                            if(channel.isOpen()) {
+                                notifySingle(channel, msg);
+                            }else{
+                                core.removeChannel(channel);
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -337,23 +345,49 @@ public class Server {
      */
     private static synchronized void notifySingle(AsynchronousSocketChannel channel,String msg) {
         try {
-            ByteBuffer byteBuffer = CharsetUtils.encode(msg);
-            channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
-                @Override
-                public void completed(Integer result, ByteBuffer buffer) {
-                    if (buffer.hasRemaining()) {
-                        channel.write(buffer, buffer, this);
+            if(msg!=null) {
+                //阻塞等待当前channel没有在发送消息
+                while (writingChnnelExits(channel)) {}
+                addWritingChannel(channel);
+                ByteBuffer byteBuffer = CharsetUtils.encode(msg);
+                channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
+                    @Override
+                    public void completed(Integer result, ByteBuffer buffer) {
+                        if (buffer.hasRemaining()) {
+                            channel.write(buffer, buffer, this);
+                        }
+                        removeWritingChannel(channel);
                     }
-                }
 
-                @Override
-                public void failed(Throwable exc, ByteBuffer attachment) {
-                    System.out.println("server write failed: " + exc);
-                    exc.printStackTrace();
-                }
-            });
+                    @Override
+                    public void failed(Throwable exc, ByteBuffer attachment) {
+                        removeWritingChannel(channel);
+                        System.out.println("server write failed: " + exc);
+                        exc.printStackTrace();
+                    }
+                });
+            }
         }catch (Exception e){
             e.printStackTrace();
+            removeWritingChannel(channel);
+        }
+    }
+
+    public static void addWritingChannel(AsynchronousSocketChannel channel){
+        synchronized (writingChannel) {
+            writingChannel.put(channel, 1);
+        }
+    }
+
+    public static boolean writingChnnelExits(AsynchronousSocketChannel channel){
+        synchronized (writingChannel) {
+            return writingChannel.containsKey(channel);
+        }
+    }
+
+    public static void removeWritingChannel(AsynchronousSocketChannel channel){
+        synchronized (writingChannel){
+            writingChannel.remove(channel);
         }
     }
 

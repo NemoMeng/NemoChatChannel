@@ -1,64 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fafb4621-3b76-422c-8c32-64a64509c42a" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/MsgBean.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/PrivateMsgBean.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/annotation/Controller.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/annotation/ReqBody.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/annotation/UrlMapping.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/AuthBean.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/RequestBean.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/ResponseBean.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/bean/RouteBean.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$2.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client$3.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/Client.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/ClientThread.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/ClientUI$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/ClientUI$2.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/client/ClientUI.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/controller/ContextController.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/enums/PropertiesKeys.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/enums/ResponseCode.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/AddChannelException.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/ChannelException.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/GlobalMsgException.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/exception/ShutdownChannelException.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/NemoFrameworkCorePackageScaner.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Routers.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$2.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$3.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server$4.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/Server.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/ServerContext.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/ServerCore.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/server/StartServer.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/BeanUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/CharsetUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/CollectionUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/ExceptionUtil.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/Helper.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/MapUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/NemoFrameworkAnnotationUtils$1.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/NemoFrameworkAnnotationUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/NemoFrameworkCacheUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/NemoFrameworkPropertiesUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/NemoFrameworkUrlUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/ReflectUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/com/nemo/channel/utils/StringUtils.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/classes/nemo.framework.properties" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/test-classes/ClientTest.class" afterPath="" />
+    <list default="true" id="fafb4621-3b76-422c-8c32-64a64509c42a" name="Default" comment="1、修正">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/RequestBean.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/RequestBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/Client.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/Client.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientUI.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/client/ClientUI.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/controller/ContextController.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/controller/ContextController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/ServerContext.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/server/ServerContext.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/nemo/channel/utils/ReflectUtils.java" afterPath="$PROJECT_DIR$/src/main/java/com/nemo/channel/utils/ReflectUtils.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -82,13 +27,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="337" column="97" lean-forward="false" selection-start-line="337" selection-start-column="97" selection-end-line="337" selection-end-column="97" />
+            <state relative-caret-position="537">
+              <caret line="391" column="5" lean-forward="false" selection-start-line="391" selection-start-column="5" selection-end-line="391" selection-end-column="5" />
               <folding>
-                <element signature="e#1503#1519#0" expanded="true" />
+                <element signature="e#1542#1558#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -202,11 +147,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MsgBean.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MsgBean.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/MsgBean.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="28" column="19" lean-forward="false" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
+            <state relative-caret-position="368">
+              <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
               <folding>
                 <element signature="e#0#457#0" expanded="true" />
               </folding>
@@ -791,7 +736,7 @@
       <updated>1516328719801</updated>
       <workItem from="1516328722902" duration="17894000" />
       <workItem from="1516603802748" duration="9730000" />
-      <workItem from="1516618617732" duration="37760000" />
+      <workItem from="1516618617732" duration="39555000" />
     </task>
     <task id="LOCAL-00001" summary="1、容器集成。&#10;2、方法调用相关调整。&#10;3、框架相关细节调整。">
       <created>1516620551467</created>
@@ -814,7 +759,14 @@
       <option name="project" value="LOCAL" />
       <updated>1516697291083</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="1、全局controller调用参数调整。&#10;2、消息推送机制调整。">
+      <created>1516774455273</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1516774455273</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -850,7 +802,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65384000" />
+    <option name="totallyTimeSpent" value="67179000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -871,7 +823,7 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32937366" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32937366" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -930,11 +882,12 @@
     <MESSAGE value="1、容器集成。&#10;2、方法调用相关调整。&#10;3、框架相关细节调整。" />
     <MESSAGE value="1、授权相关调整。" />
     <MESSAGE value="1、群聊基本实现。" />
-    <option name="LAST_COMMIT_MESSAGE" value="1、群聊基本实现。" />
+    <MESSAGE value="1、全局controller调用参数调整。&#10;2、消息推送机制调整。" />
+    <option name="LAST_COMMIT_MESSAGE" value="1、全局controller调用参数调整。&#10;2、消息推送机制调整。" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="76" />
+      <option name="time" value="77" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1428,22 +1381,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/MsgBean.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="337" column="97" lean-forward="false" selection-start-line="337" selection-start-column="97" selection-end-line="337" selection-end-column="97" />
+        <state relative-caret-position="368">
+          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
           <folding>
-            <element signature="e#1503#1519#0" expanded="true" />
+            <element signature="e#0#457#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/bean/MsgBean.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/nemo/channel/server/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="28" column="19" lean-forward="false" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
+        <state relative-caret-position="537">
+          <caret line="391" column="5" lean-forward="false" selection-start-line="391" selection-start-column="5" selection-end-line="391" selection-end-column="5" />
           <folding>
-            <element signature="e#0#457#0" expanded="true" />
+            <element signature="e#1542#1558#0" expanded="true" />
           </folding>
         </state>
       </provider>
