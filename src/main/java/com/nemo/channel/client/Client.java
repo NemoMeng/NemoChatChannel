@@ -6,6 +6,7 @@ package com.nemo.channel.client;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nemo.channel.bean.AuthBean;
+import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
 import com.nemo.channel.enums.ResponseCode;
 import com.nemo.channel.utils.CharsetUtils;
@@ -274,4 +275,19 @@ public class Client{
     public void writeStringMessage(String msg) throws CharacterCodingException {
         writeMessage(CharsetUtils.encode(msg));
     }
+
+    /**
+     * 给服务端发一个消息
+     * @param method        请求的路径
+     * @param parameter     请求参数
+     * @throws CharacterCodingException
+     */
+    public void writeMsg(String method,Object parameter) throws CharacterCodingException {
+        RequestBean requestBean = new RequestBean();
+        requestBean.setMethod(method);
+        requestBean.setParams(parameter);
+
+        writeStringMessage(JSONObject.toJSONString(requestBean));
+    }
+
 }

@@ -4,18 +4,17 @@
  */
 package com.nemo.channel.bean;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * 请求参数Bean
  * Created by Nemo on 2018/1/19.
  */
 public class RequestBean {
 
+    //请求的方法
     private String method;
 
-    private Map<String,Object> params;
+    //请求的参数
+    private Object params;
 
     public String getMethod() {
         return method;
@@ -25,11 +24,11 @@ public class RequestBean {
         this.method = method;
     }
 
-    public Map<String, Object> getParams() {
+    public Object getParams() {
         return params;
     }
 
-    public void setParams(Map<String, Object> params) {
+    public void setParams(Object params) {
         this.params = params;
     }
 }

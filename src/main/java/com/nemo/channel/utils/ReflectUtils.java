@@ -59,11 +59,14 @@ public class ReflectUtils  {
      * @param params
      * @return
      */
-    public static Object invokeMehod(Object bean, Method method, Map<String,Object> params, ServerContext context) throws InvocationTargetException, IllegalAccessException {
+    public static Object invokeMehod(Object bean, Method method, Object params) throws InvocationTargetException, IllegalAccessException {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if(parameterTypes == null || parameterTypes.length<=0){
             return invokeMehod(bean,method,new Object[0]);
         }
+
+        ServerContext context = new ServerContext();
+        context.setParameter(params);
 
         Object attrs[] = new Object[parameterTypes.length];
         for(int i=0;i<parameterTypes.length;i++){
@@ -71,14 +74,7 @@ public class ReflectUtils  {
             if(cls.getName().equals("com.nemo.channel.server.ServerContext")){
                 attrs[i] = context;
             }else{
-                Object o;
-                try{
-                    o = parameterTypes[0].newInstance();
-                    o = BeanUtils.transMap2Bean(params,o);
-                }catch (Exception e){
-                    o = params;
-                }
-                attrs[i] = o;
+                attrs[i] = new Object();
             }
         }
 

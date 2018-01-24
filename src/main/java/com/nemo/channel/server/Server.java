@@ -5,6 +5,7 @@
 package com.nemo.channel.server;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nemo.channel.bean.PrivateMsgBean;
 import com.nemo.channel.bean.RequestBean;
 import com.nemo.channel.bean.ResponseBean;
 import com.nemo.channel.bean.RouteBean;
@@ -32,19 +33,18 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 服务提供者
  * Created by Nemo on 2018/1/19.
  */
 public class Server {
-    private final AsynchronousServerSocketChannel server;
-    private final Queue<ByteBuffer> queue = new LinkedList<ByteBuffer>();
-    private boolean writing = false;
 
-    public static void main(String[] args) throws IOException{
-      open();
-    }
+    private final AsynchronousServerSocketChannel server;
+
+    private static final LinkedBlockingQueue<PrivateMsgBean> privateMsgQueue = new LinkedBlockingQueue<PrivateMsgBean>();
+    private static final LinkedBlockingQueue<String> publicMsgQueue = new LinkedBlockingQueue<>();
 
     private Server() throws IOException{
         //设置线程数为CPU核数
@@ -60,9 +60,11 @@ public class Server {
      * 开启服务
      * @throws IOException
      */
-    public static void open() throws IOException {
+    public static void open() throws IOException, InterruptedException {
         Server server = new Server();
         server.dealConnect();
+        publishToAll();
+        publishToSingle();
     }
 
     /**
@@ -148,7 +150,7 @@ public class Server {
 
                                 ServerContext serverContext = new ServerContext();
                                 serverContext.setChannel(channel);
-                                Object invoke = ReflectUtils.invokeMehod(routeBean.getController(),routeBean.getMethod(), requestBean.getParams(),serverContext);
+                                Object invoke = ReflectUtils.invokeMehod(routeBean.getController(),routeBean.getMethod(), requestBean.getParams());
 
                                 //Object invoke = routeBean.getMethod().invoke(routeBean.getController(), requestBean.getParams());
                                 if(invoke != null){
@@ -176,7 +178,8 @@ public class Server {
                                     ResponseBean msgBean = new ResponseBean();
                                     msgBean.setData(msg);
                                     msgBean.setCode(ResponseCode.MSG_TYPE.name());
-                                    publish2All(JSONObject.toJSONString(msgBean));
+
+                                    sendPublic(JSONObject.toJSONString(msgBean));
                                 }else {
                                     responseBean.setCode(ResponseCode.COMMON_ERROR.name());
                                     responseBean.setMsg(ResponseCode.COMMON_ERROR.getRemark());
@@ -185,7 +188,8 @@ public class Server {
                             }
                         }
                         if(!shutdowned) {
-                            writeStringMessage(channel, JSONObject.toJSONString(responseBean));
+                            sendPrivate(channel,JSONObject.toJSONString(responseBean));
+                            //notifySingle(channel, JSONObject.toJSONString(responseBean));
                         }
                         readBuffer.clear();
                     }
@@ -247,101 +251,110 @@ public class Server {
     }
 
     /**
-     * Enqueues a write of the buffer to the channel.
-     * The call is asynchronous so the buffer is not safe to modify after
-     * passing the buffer here.
-     *
-     * @param buffer the buffer to send to the channel
+     * 发送给单独用户
+     * @param channel
+     * @param msg
      */
-    private void writeMessage(final AsynchronousSocketChannel channel, final ByteBuffer buffer) {
-        boolean threadShouldWrite = false;
-
-        synchronized(queue) {
-            queue.add(buffer);
-            // Currently no thread writing, make this thread dispatch a write
-            if (!writing) {
-                writing = true;;
-                threadShouldWrite = true;
-            }
+    private static void sendPrivate(AsynchronousSocketChannel channel,String msg){
+        try {
+            PrivateMsgBean privateMsgBean = new PrivateMsgBean();
+            privateMsgBean.setMsg(msg);
+            privateMsgBean.setChannel(channel);
+            privateMsgQueue.put(privateMsgBean);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
-        if (threadShouldWrite) {
-            writeFromQueue(channel);
-        }
-    }
-
-    private void writeFromQueue(final AsynchronousSocketChannel channel) {
-        ByteBuffer buffer;
-
-        synchronized (queue) {
-            buffer = queue.poll();
-            if (buffer == null) {
-                writing = false;
-            }
-        }
-
-        // No new data in buffer to write
-        if (writing) {
-            writeBuffer(channel, buffer);
-        }
-    }
-
-    private void writeBuffer(final AsynchronousSocketChannel channel, ByteBuffer buffer) {
-        channel.write(buffer, buffer, new CompletionHandler<Integer, ByteBuffer>() {
-            @Override
-            public void completed(Integer result, ByteBuffer buffer) {
-                if (buffer.hasRemaining()) {
-                    channel.write(buffer, buffer, this);
-                } else {
-                    // Go back and check if there is new data to write
-                    writeFromQueue(channel);
-                }
-            }
-
-            @Override
-            public void failed(Throwable exc, ByteBuffer attachment) {
-                System.out.println("server write failed: " + exc);
-                exc.printStackTrace();
-            }
-        });
     }
 
     /**
-     * Sends a message
+     * 发送给所有用户
      * @param msg
-     * @throws CharacterCodingException
      */
-    private void writeStringMessage(final AsynchronousSocketChannel channel, String msg) throws CharacterCodingException {
-        writeMessage(channel, CharsetUtils.encode(msg));
+    public static void sendPublic(String msg){
+        try {
+            publicMsgQueue.put(msg);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * 发送到全部人
-     * @param msg
+     * 从队列中读取发送给某个人的消息
      */
-    private void publish2All(String msg) throws CharacterCodingException {
-        ServerCore core = ServerCore.core();
-        Map<AsynchronousSocketChannel, String> channels = core.getChannels();
-        for(AsynchronousSocketChannel channel : channels.keySet()){
-            if(channel.isOpen()) {
-                ByteBuffer byteBuffer = CharsetUtils.encode(msg);
-                channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
-                    @Override
-                    public void completed(Integer result, ByteBuffer buffer) {
-                        if (buffer.hasRemaining()) {
-                            channel.write(buffer, buffer, this);
+    private static void publishToSingle(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ServerCore core = ServerCore.core();
+                PrivateMsgBean privateMsgBean;
+                try {
+                    while ((privateMsgBean = privateMsgQueue.take()) != null) {
+                        System.out.println("===== single ====");
+                        AsynchronousSocketChannel channel = privateMsgBean.getChannel();
+                        if (channel.isOpen()) {
+                            notifySingle(privateMsgBean.getChannel(), privateMsgBean.getMsg());
+                        } else {
+                            core.removeChannel(channel);
                         }
                     }
-
-                    @Override
-                    public void failed(Throwable exc, ByteBuffer attachment) {
-                        System.out.println("server write failed: " + exc);
-                        exc.printStackTrace();
-                    }
-                });
-            }else {
-                core.removeChannel(channel);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
+        }).start();
+    }
+
+    /**
+     * 发送消息给所有人
+     * @throws CharacterCodingException
+     * @throws InterruptedException
+     */
+    private static void publishToAll() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ServerCore core = ServerCore.core();
+                Map<AsynchronousSocketChannel, String> channels = core.getChannels();
+                String msg;
+                try {
+                    while ((msg = publicMsgQueue.take()) != null) {
+                        for (AsynchronousSocketChannel channel : channels.keySet()) {
+                            //多线程下会有问题，这里先转私有发送队列，由私有发送通道发送
+                            sendPrivate(channel,msg);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 发送给单个人
+     * @param channel
+     * @param msg
+     */
+    private static synchronized void notifySingle(AsynchronousSocketChannel channel,String msg) {
+        try {
+            ByteBuffer byteBuffer = CharsetUtils.encode(msg);
+            channel.write(byteBuffer, byteBuffer, new CompletionHandler<Integer, ByteBuffer>() {
+                @Override
+                public void completed(Integer result, ByteBuffer buffer) {
+                    if (buffer.hasRemaining()) {
+                        channel.write(buffer, buffer, this);
+                    }
+                }
+
+                @Override
+                public void failed(Throwable exc, ByteBuffer attachment) {
+                    System.out.println("server write failed: " + exc);
+                    exc.printStackTrace();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
+
 }

@@ -5,6 +5,8 @@
 package com.nemo.channel.client;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nemo.channel.bean.AuthBean;
+import com.nemo.channel.bean.MsgBean;
 import com.nemo.channel.bean.RequestBean;
 
 import java.awt.BorderLayout;
@@ -50,19 +52,16 @@ public class ClientUI extends JFrame {
     public static void main(String[] args) throws IOException, InterruptedException {
         client = Client.getClient();
 
-        //启动的时候先登录
-        Map<String,Object> params = new HashMap<>();
         title = "Nemo"+ new Random().nextInt();
-        params.put("name",title);
-        params.put("password","123456");
-        RequestBean requestBean = new RequestBean();
-        requestBean.setParams(params);
-        requestBean.setMethod("login");
 
         ClientUI clientUI = new ClientUI();
         client.setUI(clientUI);
 
-        client.writeStringMessage(JSONObject.toJSONString(requestBean));
+        //启动的时候先登录
+        AuthBean auth = new AuthBean();
+        auth.setName(title);
+        auth.setPassword("123456");
+        client.writeMsg("login",auth);
     }
     public ClientUI() {
         super(title);
@@ -78,22 +77,18 @@ public class ClientUI extends JFrame {
                 try {
                     RequestBean requestBean = new RequestBean();
 
-
                     String method = tfMethod.getText();
                     if(method == null){
                         return;
                     }
-                    Map<String,Object> params = new HashMap<>();
-                    params.put("name","Nemo");
-                    params.put("password","123456");
                     if(method.equals("chat/global")){
-                        params.put("msg",tfSend.getText());
+                        MsgBean params = new MsgBean();
+                        params.setMsg(tfSend.getText());
+                        requestBean.setMethod(method);
+                        requestBean.setParams(params);
+                        client.writeStringMessage(JSONObject.toJSONString(requestBean));
                     }
-                    requestBean.setMethod(method);
-                    requestBean.setParams(params);
-                    client.writeStringMessage(JSONObject.toJSONString(requestBean));
 
-//                    addShow("我："+tfSend.getText());
                 } catch (CharacterCodingException e1) {
                     e1.printStackTrace();
                 }
@@ -128,10 +123,6 @@ public class ClientUI extends JFrame {
         this.setSize(400, 300);
         this.setLocation(0, 200);
         this.setVisible(true);
-
-        //开始连接
-        //clientThread = new ClientThread();
-        //new Thread(clientThread).start();
     }
 
     public synchronized void addShow(String msg){
